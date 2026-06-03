@@ -1,0 +1,59 @@
+# Lavalink v4 configuration — https://lavalink.dev/configuration/
+#
+# Plugins provide the providers you wanted:
+#   - youtube-plugin → YouTube / YouTube Music
+#   - lavasrc        → Spotify links (resolved via search mirrors)
+#   - built-in       → SoundCloud, Bandcamp, Twitch, HTTP
+#
+# Spotify credentials come from the host env (docker-compose passes them through).
+
+server:
+  port: 2333
+  address: 0.0.0.0
+
+lavalink:
+  plugins:
+    # Keep this current — YouTube changes its player cipher periodically and older
+    # versions silently fail at playback (track loads, no audio).
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.18.1"
+      repository: "https://maven.lavalink.dev/releases"
+    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.4.1"
+      repository: "https://maven.lavalink.dev/releases"
+  server:
+    password: "youshallnotpass"
+    sources:
+      youtube: false      # served by youtube-plugin below instead of the built-in
+      soundcloud: true
+      bandcamp: true
+      twitch: true
+      http: true
+      local: false
+    bufferDurationMs: 400
+    frameBufferDurationMs: 5000
+    opusEncodingQuality: 10
+    resamplingQuality: LOW
+    playerUpdateInterval: 5
+
+plugins:
+  youtube:
+    enabled: true
+    clients:
+      - MUSIC
+      - WEB
+      - ANDROID_VR
+  lavasrc:
+    sources:
+      # Spotify disabled: it now requires Spotify Premium to get Web API credentials.
+      # Flip back to true and fill SPOTIFY_CLIENT_ID/SECRET in .env to enable links.
+      spotify: false
+      applemusic: false
+      deezer: false
+    spotify:
+      clientId: "${SPOTIFY_CLIENT_ID}"
+      clientSecret: "${SPOTIFY_CLIENT_SECRET}"
+      countryCode: "US"
+
+logging:
+  level:
+    root: INFO
+    lavalink: INFO

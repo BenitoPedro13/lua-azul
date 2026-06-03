@@ -1,0 +1,27 @@
+{
+  "name": "lua-azul",
+  "version": "0.1.0",
+  "description": "Lua Azul — a multipurpose Discord bot: music (Spotify/SoundCloud/YouTube), logging, commands and content engagement.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "scripts": {
+    "dev": "pnpm --filter @lua-azul/bot dev",
+    "build": "pnpm -r build",
+    "start": "pnpm --filter @lua-azul/bot start",
+    "deploy:commands": "pnpm --filter @lua-azul/bot run deploy:commands",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @lua-azul/bot db:generate",
+    "db:migrate": "pnpm --filter @lua-azul/bot db:migrate",
+    "db:studio": "pnpm --filter @lua-azul/bot db:studio",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

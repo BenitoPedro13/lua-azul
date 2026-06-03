@@ -1,0 +1,65 @@
+// Prisma schema — see ADR-0003.
+// After editing: `pnpm db:migrate` (dev) creates a migration + regenerates the client.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// A Discord guild (server) the bot is in. `id` is the Discord snowflake.
+model Guild {
+  id        String       @id
+  name      String?
+  joinedAt  DateTime     @default(now())
+  config    GuildConfig?
+  auditLogs AuditLog[]
+}
+
+/// Per-guild settings. One row per guild; created lazily on first config write.
+model GuildConfig {
+  guildId String @id
+  guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  // module toggles
+  musicEnabled   Boolean @default(true)
+  loggingEnabled Boolean @default(false)
+
+  // music
+  djRoleId      String?
+  defaultVolume Int     @default(100)
+  maxQueueSize  Int     @default(500)
+
+  // logging
+  logChannelId String?
+  logEvents    String[] @default([]) // e.g. ["messageDelete","guildMemberAdd"]
+
+  updatedAt DateTime @updatedAt
+}
+
+/// Persisted audit-log feature events (distinct from app logging).
+model AuditLog {
+  id        String   @id @default(cuid())
+  guildId   String
+  guild     Guild    @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  type      String // "messageDelete" | "messageUpdate" | "guildMemberAdd" | ...
+  actorId   String? // user who triggered the event, if known
+  channelId String?
+  payload   Json? // event-specific snapshot
+  createdAt DateTime @default(now())
+
+  @@index([guildId, type, createdAt])
+}
+
+/// Example engagement model — per-user activity tally within a guild.
+model EngagementCounter {
+  guildId   String
+  userId    String
+  messages  Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@id([guildId, userId])
+}

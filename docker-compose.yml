@@ -1,0 +1,44 @@
+# Local development infrastructure for Lua Azul.
+# The bot runs on the host via `pnpm dev` (fast reloads); this file provides the
+# two stateful services it talks to: Postgres and Lavalink.
+#
+#   pnpm infra:up      # start postgres + lavalink in the background
+#   pnpm infra:logs    # tail their logs
+#   pnpm infra:down    # stop them
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lua
+      POSTGRES_PASSWORD: lua
+      POSTGRES_DB: lua_azul
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lua -d lua_azul"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  lavalink:
+    image: ghcr.io/lavalink-devs/lavalink:4
+    restart: unless-stopped
+    environment:
+      _JAVA_OPTIONS: -Xmx512m
+      SERVER_PORT: 2333
+      # Mirrored into application.yml via ${...} placeholders:
+      SPOTIFY_CLIENT_ID: ${SPOTIFY_CLIENT_ID:-}
+      SPOTIFY_CLIENT_SECRET: ${SPOTIFY_CLIENT_SECRET:-}
+    volumes:
+      - ./infra/lavalink/application.yml:/opt/Lavalink/application.yml:ro
+    ports:
+      - "2333:2333"
+    # No healthcheck: the Lavalink image ships no nc/curl, so any in-container probe
+    # gives false "unhealthy". The bot's lavalink-client retries the connection itself.
+
+volumes:
+  pgdata:
