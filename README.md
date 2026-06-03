@@ -4,7 +4,8 @@ A multipurpose Discord bot: **music** (Spotify/SoundCloud/YouTube), **logging**,
 **content engagement**. Built with TypeScript, discord.js, Lavalink, and Postgres.
 
 > **Design docs:** [`docs/architecture.md`](./docs/architecture.md) ·
-> [`docs/ROADMAP.md`](./docs/ROADMAP.md) · [Architecture Decision Records](./docs/adr/)
+> [`docs/ROADMAP.md`](./docs/ROADMAP.md) · [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) ·
+> [Architecture Decision Records](./docs/adr/)
 
 ## Stack
 

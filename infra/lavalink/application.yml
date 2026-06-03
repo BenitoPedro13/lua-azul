@@ -20,7 +20,9 @@ lavalink:
     - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.4.1"
       repository: "https://maven.lavalink.dev/releases"
   server:
-    password: "youshallnotpass"
+    # Override with LAVALINK_SERVER_PASSWORD in production (must match the bot's
+    # LAVALINK_PASSWORD). Falls back to the local-dev default.
+    password: "${LAVALINK_SERVER_PASSWORD:youshallnotpass}"
     sources:
       youtube: false      # served by youtube-plugin below instead of the built-in
       soundcloud: true
@@ -49,8 +51,9 @@ plugins:
       applemusic: false
       deezer: false
     spotify:
-      clientId: "${SPOTIFY_CLIENT_ID}"
-      clientSecret: "${SPOTIFY_CLIENT_SECRET}"
+      # Empty defaults so Lavalink boots even when these are unset (Spotify disabled).
+      clientId: "${SPOTIFY_CLIENT_ID:}"
+      clientSecret: "${SPOTIFY_CLIENT_SECRET:}"
       countryCode: "US"
 
 logging:
